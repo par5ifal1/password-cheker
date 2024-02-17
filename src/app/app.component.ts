@@ -1,41 +1,37 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { PasswordStrengthService } from './services/password-strength.service'
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
+  strengthService:PasswordStrengthService;
+  formRew!: FormGroup;
 
-  strength:string = "";
-  
-  handleInputChange(event: Event): void {
-    const inputValue = (event.target as HTMLInputElement).value;
-
-    this.checkPasswordStrength(inputValue.replaceAll(" ", ""));
+  ngOnInit(): void {
+    this.formRew = this.fb.group({
+      password: [''],
+      strength: ['']
+    });
+    
+    const yourFieldControl = this.formRew.get('password');
+    if(yourFieldControl){
+    yourFieldControl.valueChanges.subscribe((newValue) => {
+      this.formRew.patchValue({
+        strength: this.strengthService.checkPasswordStrength(newValue)
+      })
+    });
+  };
   }
 
-  checkPasswordStrength(password:string) {
+  constructor(passwordStrengthService: PasswordStrengthService, private fb:FormBuilder) {
+    this.strengthService = passwordStrengthService;
+  }
 
-    if (password.length == 0){
-      this.strength = "gray";
-    } else if (password.length < 8) {
-      this.strength = "very weak";
-    } else if (password.match(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@#$%^&*!])[a-zA-Z\d@#$%^&*!]+$/) ){
-      this.strength = "strong";
-    } else if (
-      password.match(/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]+$/) 
-    || password.match(/^(?=.*[a-zA-Z])(?=.*[@#$%^&*!])[a-zA-Z\d@#$%^&*!]+$/) 
-    || password.match(/^(?=.*\0-9)(?=.*[@#$%^&*!])[a-zA-Z\d@#$%^&*!]+$/)) 
-    {
-      this.strength = "medium";
-    } else if (
-      password.match(/^[a-zA-Z]+$/) 
-    || password.match(/^[\d]+$/) 
-    || password.match(/^[!@#$%^&*(),.?":{}|<>]+$/))
-    {
-      console.log("weak")
-      this.strength = "weak";
-    }
+  getStrength(){
+    return this.formRew.value.strength;
   }
 }

@@ -1,19 +1,6 @@
 <section>
-  <div class="container">
-    <input type="password" (input)="handleInputChange($event)">
-    <div class="strength">
-      <div class="level" [ngClass]="{
-        'red': strength == 'very weak', 
-        'green': strength == 'strong'}">Strong</div>
-      <div class="level" [ngClass]="{
-        'red': strength == 'very weak', 
-        'yellow': strength == 'medium', 
-        'green': strength == 'strong'}">Medium</div>
-      <div class="level" [ngClass]="{
-        'red': strength == 'very weak' || strength == 'weak', 
-        'yellow': strength == 'medium',
-        'green': strength == 'strong'
-        }">Weak</div>
-    </div>
-  </div>
+  <form [formGroup]="formRew" class="container">
+    <app-password-input formControlName="password"s></app-password-input>
+    <app-password-strength-indicator [strength]="getStrength()" ></app-password-strength-indicator>
+  </form>
 </section>
